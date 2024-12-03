@@ -5,7 +5,7 @@ import { Box, Spinner } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense } from "react";
 import Navbar from "./components/navbar";
 
 const fetchData = async (URL) => {
@@ -15,12 +15,12 @@ const fetchData = async (URL) => {
 const EnquiriesTable = lazy(() => import("@/pages/components/EnquiriesTable"));
 export default function Home() {
   const router = useRouter();
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-    }
-  }, [router]);
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if (!token) {
+  //     router.push("/login");
+  //   }
+  // }, [router]);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["enquiries"],

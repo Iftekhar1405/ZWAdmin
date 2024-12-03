@@ -1,10 +1,4 @@
-import {
-  CheckIcon,
-  DeleteIcon,
-  EditIcon,
-  EmailIcon,
-  SearchIcon,
-} from "@chakra-ui/icons";
+import { CheckIcon, SearchIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -47,13 +41,26 @@ import debounce from "lodash.debounce";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { HiSortAscending, HiSortDescending } from "react-icons/hi";
-import { LuFilter, LuPhoneCall, LuPrinter } from "react-icons/lu";
+import { LuFilter, LuPrinter } from "react-icons/lu";
 import Select from "react-select";
 import { useTable } from "react-table";
 import { useReactToPrint } from "react-to-print";
 import { useErrorAlert, useSuccessAlert } from "../common/Alertfn";
 import Editbookings from "../edit/id";
+import ActionButton from "./ActionButtons";
 import { filterKeys, filterKeysValues } from "./filter";
+
+export const handleDelete = async (e, id) => {
+  try {
+    e.stopPropagation();
+    await axios.delete(`http://localhost:5000/bookings/${id}`);
+    SuccessAlert("bookings deleted successfully!");
+    queryClient.invalidateQueries(["bookingsss"]);
+  } catch (error) {
+    console.error("Failed to delete bookings:", error);
+    ErrorAlert("bookings deletetion failed!");
+  }
+};
 
 export default function bookingsssTable() {
   const router = useRouter();
@@ -188,7 +195,7 @@ export default function bookingsssTable() {
   const editFunc = (e, row) => {
     e.stopPropagation();
     // console.log(row)
-    setbookingsData(row.original);
+    setbookingsData(row);
     // console.log(bookingsData)
     onOpen();
   };
@@ -199,17 +206,6 @@ export default function bookingsssTable() {
     setSearchTerm(e.target.value);
   };
   const queryClient = useQueryClient();
-  const handleDelete = async (e, id) => {
-    try {
-      e.stopPropagation();
-      await axios.delete(`http://localhost:5000/bookings/${id}`);
-      SuccessAlert("bookings deleted successfully!");
-      queryClient.invalidateQueries(["bookingsss"]);
-    } catch (error) {
-      console.error("Failed to delete bookings:", error);
-      ErrorAlert("bookings deletetion failed!");
-    }
-  };
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => {
@@ -637,6 +633,7 @@ export default function bookingsssTable() {
                       {row.cells.map((cell) => {
                         // console.log("cell", cell);
                         const toShow = cell.column.show;
+                        // console.log(cell);
                         return (
                           toShow && (
                             <Td
@@ -650,10 +647,26 @@ export default function bookingsssTable() {
                               ) : cell.column.Header === "Actions" &&
                                 !printing ? (
                                 <ActionButton
-                                  row={row}
+                                  row={row.original}
                                   editFunc={editFunc}
                                   handleDelete={handleDelete}
+                                  refetch={refetch}
                                 />
+                              ) : cell.column.Header === "Status" ? (
+                                <Tag
+                                  colorScheme={
+                                    cell.value === "pending"
+                                      ? "yellow"
+                                      : cell.value === "confirmed"
+                                      ? "green"
+                                      : cell.value === "completed"
+                                      ? "blue"
+                                      : "red"
+                                  }
+                                  p={5}
+                                >
+                                  {cell.render("Cell")}
+                                </Tag>
                               ) : cell.value !== undefined &&
                                 cell.value !== null ? (
                                 cell.render("Cell")
@@ -674,48 +687,5 @@ export default function bookingsssTable() {
       )}
       <Editbookings isOpen={isOpen} onClose={onClose} data={bookingsData} />
     </Box>
-  );
-}
-
-function ActionButton({ row, editFunc, handleDelete }) {
-  return (
-    <HStack
-      spacing={2}
-      sx={{
-        "@media print": {
-          display: "none",
-        },
-      }}
-    >
-      <a
-        href={`tel:${row.original.mobile}`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <IconButton
-          icon={<LuPhoneCall />}
-          onClick={(e) => e.stopPropagation()}
-        />
-      </a>
-      <a
-        href={`mailto:${row.original.email}`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <IconButton icon={<EmailIcon />} onClick={(e) => e.stopPropagation()} />
-      </a>
-      <IconButton
-        icon={<EditIcon />}
-        onClick={(e) => editFunc(e, row)}
-        aria-label="Edit"
-        size="sm"
-        colorScheme="cyan"
-      />
-      <IconButton
-        icon={<DeleteIcon />}
-        onClick={(e) => handleDelete(e, row.original._id)}
-        aria-label="Delete"
-        size="sm"
-        colorScheme="red"
-      />
-    </HStack>
   );
 }

@@ -1,8 +1,6 @@
-import { EditIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
-  Button,
   HStack,
   IconButton,
   Spinner,
@@ -24,6 +22,8 @@ import { useEffect, useRef, useState } from "react";
 import { HiPrinter } from "react-icons/hi2";
 import { useReactToPrint } from "react-to-print";
 import { useErrorAlert, useSuccessAlert } from "./common/Alertfn";
+import ActionButton from "./components/ActionButtons";
+import { handleDelete } from "./components/EnquiriesTable";
 import { Loader } from "./components/Loader";
 import Navbar from "./components/navbar";
 import Editbookings from "./edit/id";
@@ -65,10 +65,10 @@ export default function bookingsDetails() {
     contentRef: printRef,
   });
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) router.push("/login");
-  }, [router]);
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if (!token) router.push("/login");
+  // }, [router]);
 
   // Fetch bookings data
   const {
@@ -212,18 +212,12 @@ export default function bookingsDetails() {
                     </Text>
                   </HStack>
                   <HStack>
-                    <Button
-                      leftIcon={<EditIcon />}
-                      onClick={onOpen}
-                      colorScheme="teal"
-                      sx={{
-                        "@media print": {
-                          display: "none",
-                        },
-                      }}
-                    >
-                      Edit bookings
-                    </Button>
+                    <ActionButton
+                      row={bookingsData}
+                      editFunc={onOpen}
+                      handleDelete={handleDelete}
+                      refetch={refetch}
+                    />
                     <IconButton
                       icon={<HiPrinter />}
                       onClick={handlePrint}
