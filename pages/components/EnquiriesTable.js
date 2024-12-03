@@ -37,6 +37,7 @@ import {
 } from "@chakra-ui/react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { format } from "date-fns";
 import debounce from "lodash.debounce";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -629,6 +630,7 @@ export default function bookingsssTable() {
                       _hover={{ bg: tableHoverBg }}
                       cursor="pointer"
                       onClick={() => router.push(`/${row.original._id}`)}
+                      key={row.original._id}
                     >
                       {row.cells.map((cell) => {
                         // console.log("cell", cell);
@@ -667,6 +669,9 @@ export default function bookingsssTable() {
                                 >
                                   {cell.render("Cell")}
                                 </Tag>
+                              ) : cell.column.Header === "Booking Date Time" ||
+                                cell.column.Header === "Created At" ? (
+                                format(cell.value, "dd/MM/yyyy 'at' h:mm a")
                               ) : cell.value !== undefined &&
                                 cell.value !== null ? (
                                 cell.render("Cell")

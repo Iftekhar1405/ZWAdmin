@@ -1,3 +1,4 @@
+// <Box>helo</Box>
 import {
   Avatar,
   Box,
@@ -69,8 +70,7 @@ export default function bookingsDetails() {
   //   const token = localStorage.getItem("token");
   //   if (!token) router.push("/login");
   // }, [router]);
-
-  // Fetch bookings data
+  // bro you need to hesitate, why the fuck you act like thisss
   const {
     data: bookingsData,
     isLoading: isbookingsLoading,
@@ -339,6 +339,5 @@ export default function bookingsDetails() {
       {/* {console.log("endata", bookingsData)} */}
       <Editbookings isOpen={isOpen} onClose={onClose} data={bookingsData} />
     </>
-    // <Box>helo</Box>
   );
 }
